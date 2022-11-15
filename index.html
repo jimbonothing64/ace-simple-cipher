@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.13.0/ace.js" type="text/javascript" charset="utf-8"></script>
+        <!-- <script data-main="scripts/main" src="scripts/require.js"></script> -->
+        
+    </head>
+    <body>
+        <button id="btn-txt" disabled onclick="textMode()">Text</button>
+        <button id="btn-cyp" onclick="cypherMode()">Cypher</button>
+        
+        <div class="edit1" id="editor1">some text</div>
+        <div class="edit2" id="editor2">some texte</div>
+        
+        <script>
+            const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+            
+            var editor1 = ace.edit("editor1");
+            var editor2 = ace.edit("editor2");
+            
+            var textSession = ace.createEditSession("Your Text to Encrypt");
+            var cypherSession = ace.createEditSession("Your key");
+            var encryptSession = ace.createEditSession("");
+
+            editor1.setSession(textSession);
+            editor2.setSession(encryptSession);
+            
+            textSession.on('change', (e) => {
+                    if (editor1.isFocused()) {
+                        encryptSession.setValue(encryptMsg(cypherSession.getValue(), textSession.getValue()));
+                }
+            });
+
+            cypherSession.on('change', (e) => {
+                    if (editor1.isFocused()) {
+                        encryptSession.setValue(encryptMsg(cypherSession.getValue(), textSession.getValue()));
+                }
+            });
+            
+            encryptSession.on('change', (e) => {
+                if (editor2.isFocused()) {
+                    textSession.setValue(decryptMsg(cypherSession.getValue(), encryptSession.getValue()));
+                }
+            });
+
+         
+            function textMode() {
+                document.getElementById("btn-txt").disabled = true;
+                document.getElementById("btn-cyp").disabled = false;
+                editor1.setSession(textSession);
+            }
+            
+            function cypherMode() {
+                document.getElementById("btn-cyp").disabled = true;
+                document.getElementById("btn-txt").disabled = false;
+                editor1.setSession(cypherSession);
+            }
+
+            function encryptMsg(key, msg) {
+                const unqiueKeys = new Set(key.toLowerCase().split(''));
+                const alpha = ALPHABET.split('').filter(( letter ) =>  !unqiueKeys.has(letter));
+                const sub = [...unqiueKeys, ...alpha];
+                return msg.toLowerCase().split('').map( (letter) => sub[ALPHABET.indexOf(letter)]).join('');
+            }
+
+            function decryptMsg(key, msg) {
+                const unqiueKeys = new Set(key.toLowerCase().split(''));
+                const alpha = ALPHABET.split('').filter(( letter ) =>  !unqiueKeys.has(letter));
+                const sub = [...unqiueKeys, ...alpha];
+                return msg.toLowerCase().split('').map( (letter) => ALPHABET[sub.indexOf(letter)]).join('');
+            }
+
+           
+            // document.getElementById('editor1').style.fontSize='18px';
+            // document.getElementById('editor2').style.fontSize='18px';
+            
+        </script>
+    </body>
+    <style>
+        .edit1 {
+            position: absolute;
+            width: 500px;
+            height: 400px;}
+    .edit2 {
+            position: absolute;
+            left: 500px;
+            width: 500px;
+            height: 400px;}
+
+    </style>
+</html>
